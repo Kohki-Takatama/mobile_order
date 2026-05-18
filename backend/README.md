@@ -56,3 +56,12 @@ APIサーバーを起動したい場合は、従来どおり以下を使いま�
 ```bash
 docker compose up --build
 ```
+
+
+## テストケース一覧（学習用）
+
+インターン生向けに、テスト観点を以下へ整理しています。
+
+- [APIテストケース一覧（TEST_CASES.md）](./TEST_CASES.md)
+
+自動テスト実装は `tests/test_api.py` を参照してください。
