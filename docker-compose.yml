@@ -1,0 +1,9 @@
+services:
+  backend:
+    build:
+      context: ./backend
+    container_name: mobile-order-backend
+    ports:
+      - "8000:8000"
+    volumes:
+      - ./backend:/app
