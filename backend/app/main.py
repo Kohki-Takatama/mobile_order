@@ -1,4 +1,6 @@
-from fastapi import Depends, FastAPI, HTTPException, Request, status
+from contextlib import asynccontextmanager
+
+from fastapi import Depends, FastAPI, HTTPException, Request
 from fastapi.exceptions import RequestValidationError
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import JSONResponse
@@ -11,7 +13,19 @@ from .seed import seed_initial_data
 
 FIXED_USER_ID = 1
 
-app = FastAPI(title="Mobile Order Mock Backend")
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    Base.metadata.create_all(bind=engine)
+    db = next(get_db())
+    try:
+        seed_initial_data(db)
+        yield
+    finally:
+        db.close()
+
+
+app = FastAPI(title="Mobile Order Mock Backend", lifespan=lifespan)
 
 app.add_middleware(
     CORSMiddleware,
@@ -36,16 +50,6 @@ async def http_exception_handler(request: Request, exc: HTTPException) -> JSONRe
 @app.exception_handler(Exception)
 async def generic_exception_handler(request: Request, exc: Exception) -> JSONResponse:
     return JSONResponse(status_code=500, content={"message": "想定外エラーが発生しました。"})
-
-
-@app.on_event("startup")
-def on_startup() -> None:
-    Base.metadata.create_all(bind=engine)
-    db = next(get_db())
-    try:
-        seed_initial_data(db)
-    finally:
-        db.close()
 
 
 def build_cart_item_response(cart_item: models.CartItem) -> schemas.CartItemResponse:
