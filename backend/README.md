@@ -44,6 +44,9 @@ docker compose up --build
 
 ローカルPython環境を汚さずに、Docker上だけでテストできます。
 
+`test` サービスは `test` プロファイルに分離しているため、通常の起動コマンド
+`docker compose up --build` では実行されません。
+
 ```bash
 docker compose run --rm test
 ```
