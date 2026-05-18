@@ -39,3 +39,17 @@ docker compose up --build
 - 注文完了画面
 - 注文履歴画面
 - 注文詳細画面
+
+## テスト実行（Dockerのみ）
+
+ローカルPython環境を汚さずに、Docker上だけでテストできます。
+
+```bash
+docker compose run --rm test
+```
+
+APIサーバーを起動したい場合は、従来どおり以下を使います。
+
+```bash
+docker compose up --build
+```

@@ -7,3 +7,11 @@ services:
       - "8000:8000"
     volumes:
       - ./backend:/app
+
+  test:
+    build:
+      context: ./backend
+    working_dir: /app
+    volumes:
+      - ./backend:/app
+    command: sh -c "pip install -r requirements.txt && pytest -q"
