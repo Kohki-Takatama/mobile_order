@@ -138,23 +138,23 @@ def delete_cart_item(cart_item_id: int, db: Session = Depends(get_db)) -> schema
 
 @app.post("/orders", response_model=schemas.OrderDetailResponse)
 def create_order(db: Session = Depends(get_db)) -> schemas.OrderDetailResponse:
-    cart_items = (
-        db.query(models.CartItem)
-        .options(joinedload(models.CartItem.product))
-        .filter(models.CartItem.user_id == FIXED_USER_ID)
-        .all()
-    )
-    if not cart_items:
-        raise HTTPException(status_code=409, detail="カートが空です。")
-
+    response_items: list[schemas.OrderItemResponse] = []
     try:
         with db.begin():
+            cart_items = (
+                db.query(models.CartItem)
+                .options(joinedload(models.CartItem.product))
+                .filter(models.CartItem.user_id == FIXED_USER_ID)
+                .all()
+            )
+            if not cart_items:
+                raise HTTPException(status_code=409, detail="カートが空です。")
+
             total_amount = sum(item.product.price * item.quantity for item in cart_items)
             order = models.Order(user_id=FIXED_USER_ID, status="ordered", total_amount=total_amount)
             db.add(order)
             db.flush()
 
-            response_items: list[schemas.OrderItemResponse] = []
             for item in cart_items:
                 order_item = models.OrderItem(
                     order_id=order.id,
